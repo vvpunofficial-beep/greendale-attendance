@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Greendale Agropark - Attendance Kiosk</title>
+  <style>
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6f8; color: #333333; margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
+    .card { background: #ffffff; padding: 35px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); width: 420px; border-top: 5px solid #82c91e; border: 1px solid #e1e4e8; border-top: 5px solid #82c91e; }
+    .logo-container { text-align: center; margin-bottom: 25px; }
+    .logo-container h1 { color: #2b2b2b; font-size: 24px; margin: 5px 0 0 0; letter-spacing: 1px; font-weight: 700; }
+    .logo-container h1 span { color: #82c91e; }
+    .logo-container p { color: #666; font-size: 13px; margin: 4px 0 0 0; }
+    .form-group { margin-bottom: 20px; }
+    label { display: block; margin-bottom: 8px; font-weight: 600; color: #444; font-size: 14px; }
+    input { width: 100%; padding: 12px; box-sizing: border-box; background: #fafbfc; border: 1px solid #d1d5db; color: #111; border-radius: 6px; font-size: 18px; text-align: center; }
+    input:focus { border-color: #82c91e; outline: none; background: #fff; box-shadow: 0 0 0 3px rgba(130, 201, 30, 0.15); }
+    .info-box { background: #f0fdf4; border-left: 4px solid #82c91e; padding: 12px; border-radius: 4px; margin-bottom: 20px; display: none; }
+    .info-box p { margin: 4px 0; color: #1f2937; font-size: 14px; }
+    .btn-container { display: flex; gap: 10px; }
+    button { flex: 1; padding: 14px; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; color: #fff; transition: opacity 0.2s; }
+    button:hover { opacity: 0.9; }
+    .btn-in { background: #10b981; display: none; }
+    .btn-out { background: #ef4444; display: none; }
+    #msg { margin-top: 15px; text-align: center; font-weight: bold; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo-container">
+      <h1>GREENDALE <span>AGROPARK</span></h1>
+      <p>Employee Attendance Kiosk</p>
+    </div>
+    
+    <div class="form-group">
+      <label>Enter Enrollment Number</label>
+      <input type="text" id="enrollNo" placeholder="e.g., E001" autofocus oninput="checkEmployee()">
+    </div>
+    
+    <div id="empInfo" class="info-box">
+      <p><strong>Name:</strong> <span id="displayName">--</span></p>
+      <p><strong>Designation:</strong> <span id="displayDesig">--</span></p>
+      <p><strong>Status:</strong> <span id="displayStatus" style="color: #10b981; font-weight: bold;">--</span></p>
+    </div>
+    
+    <div class="btn-container">
+      <button id="btnIn" class="btn-in" onclick="punch('IN')">PUNCH IN</button>
+      <button id="btnOut" class="btn-out" onclick="punch('OUT')">PUNCH OUT</button>
+    </div>
+    
+    <div id="msg"></div>
+  </div>
+
+<script>
+  // PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE:
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzrHytQHRcpP0AgbVJYKQFSCu_5vpjlUQ_FFPzDcGao5e8kxYEULbiDImsAgWV0owAluw/exec";
+
+  function checkEmployee() {
+    var enroll = document.getElementById('enrollNo').value.trim();
+    var box = document.getElementById('empInfo');
+    var btnIn = document.getElementById('btnIn');
+    var btnOut = document.getElementById('btnOut');
+    var msg = document.getElementById('msg');
+    
+    msg.innerText = '';
+    if (enroll.length < 2) {
+      box.style.display = 'none';
+      btnIn.style.display = 'none';
+      btnOut.style.display = 'none';
+      return;
+    }
+    
+    fetch(SCRIPT_URL + "?action=getStatus&enroll=" + encodeURIComponent(enroll))
+      .then(response => response.json())
+      .then(res => {
+        if (res.success) {
+          document.getElementById('displayName').innerText = res.name;
+          document.getElementById('displayDesig').innerText = res.designation;
+          box.style.display = 'block';
+          
+          if (res.isPunchedIn) {
+            document.getElementById('displayStatus').innerText = 'Currently Punched IN (Awaiting Out)';
+            document.getElementById('displayStatus').style.color = '#ef4444';
+            btnIn.style.display = 'none';
+            btnOut.style.display = 'block';
+          } else {
+            document.getElementById('displayStatus').innerText = 'Ready to Punch IN';
+            document.getElementById('displayStatus').style.color = '#10b981';
+            btnIn.style.display = 'block';
+            btnOut.style.display = 'none';
+          }
+        } else {
+          box.style.display = 'none';
+          btnIn.style.display = 'none';
+          btnOut.style.display = 'none';
+        }
+      })
+      .catch(err => console.error(err));
+  }
+
+  function punch(action) {
+    var enroll = document.getElementById('enrollNo').value.trim();
+    var msg = document.getElementById('msg');
+    
+    fetch(SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({ enroll: enroll, action: action })
+    })
+    .then(response => response.json())
+    .then(res => {
+      msg.style.color = res.success ? '#10b981' : '#ef4444';
+      msg.innerText = res.message;
+      if (res.success) {
+        document.getElementById('enrollNo').value = '';
+        document.getElementById('empInfo').style.display = 'none';
+        document.getElementById('btnIn').style.display = 'none';
+        document.getElementById('btnOut').style.display = 'none';
+      }
+    })
+    .catch(err => {
+      msg.style.color = '#ef4444';
+      msg.innerText = 'Connection error. Please try again.';
+    });
+  }
+</script>
+</body>
+</html>
