@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Greendale Agropark - Attendance Kiosk</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#82c91e">
+  <style>
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f8fafc; color: #1e293b; margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
+    .card { background: #ffffff; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.06); width: 440px; border: 1px solid #e2e8f0; border-top: 6px solid #82c91e; }
+    .logo-container { text-align: center; margin-bottom: 25px; }
+    .logo-container h1 { color: #0f172a; font-size: 24px; margin: 0; letter-spacing: 0.5px; font-weight: 700; }
+    .logo-container h1 span { color: #82c91e; }
+    .logo-container p { color: #64748b; font-size: 13px; margin: 4px 0 0 0; }
+    .form-group { margin-bottom: 20px; }
+    label { display: block; margin-bottom: 8px; font-weight: 600; color: #475569; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+    input { width: 100%; padding: 14px; box-sizing: border-box; background: #f8fafc; border: 1px solid #cbd5e1; color: #0f172a; border-radius: 8px; font-size: 20px; text-align: center; font-weight: 600; }
+    input:focus { border-color: #82c91e; outline: none; background: #fff; box-shadow: 0 0 0 3px rgba(130, 201, 30, 0.2); }
+    .info-box { background: #f0fdf4; border: 1px solid #dcfce7; border-left: 4px solid #82c91e; padding: 14px; border-radius: 6px; margin-bottom: 20px; display: none; }
+    .info-box p { margin: 6px 0; color: #166534; font-size: 14px; }
+    .btn-container { display: flex; gap: 10px; }
+    button { flex: 1; padding: 16px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; color: #fff; transition: all 0.2s; }
+    button:active { transform: scale(0.98); }
+    .btn-in { background: #10b981; display: none; }
+    .btn-out { background: #ef4444; display: none; }
+    #msg { margin-top: 15px; text-align: center; font-weight: bold; font-size: 15px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo-container">
+      <h1>GREENDALE <span>AGROPARK</span></h1>
+      <p>Employee Attendance Kiosk</p>
+    </div>
+    
+    <div class="form-group">
+      <label>Enter Enrollment Number</label>
+      <input type="text" id="enrollNo" placeholder="e.g., E001" autofocus oninput="checkEmployee()">
+    </div>
+    
+    <div id="empInfo" class="info-box">
+      <p><strong>Name:</strong> <span id="displayName">--</span></p>
+      <p><strong>Designation:</strong> <span id="displayDesig">--</span></p>
+      <p><strong>Status:</strong> <span id="displayStatus" style="font-weight: bold;">--</span></p>
+    </div>
+    
+    <div class="btn-container">
+      <button id="btnIn" class="btn-in" onclick="punch('IN')">PUNCH IN</button>
+      <button id="btnOut" class="btn-out" onclick="punch('OUT')">PUNCH OUT</button>
+    </div>
+    
+    <div id="msg"></div>
+  </div>
+
+<script>
+  // PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE:
+  const SCRIPT_URL = "YOUR_WEB_APP_URL_HERE";
+
+  function checkEmployee() {
+    var enroll = document.getElementById('enrollNo').value.trim();
+    var box = document.getElementById('empInfo');
+    var btnIn = document.getElementById('btnIn');
+    var btnOut = document.getElementById('btnOut');
+    var msg = document.getElementById('msg');
+    
+    msg.innerText = '';
+    if (enroll.length < 2) {
+      box.style.display = 'none';
+      btnIn.style.display = 'none';
+      btnOut.style.display = 'none';
+      return;
+    }
+    
+    fetch(SCRIPT_URL + "?action=getStatus&enroll=" + encodeURIComponent(enroll))
+      .then(response => response.json())
+      .then(res => {
+        if (res.success) {
+          document.getElementById('displayName').innerText = res.name;
+          document.getElementById('displayDesig').innerText = res.designation;
+          box.style.display = 'block';
+          
+          if (res.isPunchedIn) {
+            document.getElementById('displayStatus').innerText = 'Currently Punched IN (Awaiting Out)';
+            document.getElementById('displayStatus').style.color = '#ef4444';
+            btnIn.style.display = 'none';
+            btnOut.style.display = 'block';
+          } else {
+            document.getElementById('displayStatus').innerText = 'Ready to Punch IN';
+            document.getElementById('displayStatus').style.color = '#10b981';
+            btnIn.style.display = 'block';
+            btnOut.style.display = 'none';
+          }
+        } else {
+          box.style.display = 'none';
+          btnIn.style.display = 'none';
+          btnOut.style.display = 'none';
+        }
+      });
+  }
+
+  function punch(action) {
+    var enroll = document.getElementById('enrollNo').value.trim();
+    var msg = document.getElementById('msg');
+    msg.style.color = '#475569';
+    msg.innerText = 'Processing...';
+    
+    fetch(SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({ enroll: enroll, action: action })
+    })
+    .then(response => response.json())
+    .then(res => {
+      msg.style.color = res.success ? '#10b981' : '#ef4444';
+      msg.innerText = res.message;
+      if (res.success) {
+        document.getElementById('enrollNo').value = '';
+        document.getElementById('empInfo').style.display = 'none';
+        document.getElementById('btnIn').style.display = 'none';
+        document.getElementById('btnOut').style.display = 'none';
+      }
+    })
+    .catch(() => {
+      msg.style.color = '#ef4444';
+      msg.innerText = 'Network error. Please try again.';
+    });
+  }
+
+  // Register Service Worker for PWA App installation support
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
+  }
+</script>
+</body>
+</html>

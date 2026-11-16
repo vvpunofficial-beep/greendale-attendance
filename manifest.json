@@ -1,0 +1,15 @@
+{
+  "name": "Greendale Attendance Kiosk",
+  "short_name": "Greendale Attendance",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#82c91e",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}
