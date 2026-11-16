@@ -1,9 +1,7 @@
 self.addEventListener('install', (e) => {
   e.waitUntil(
-    caches.cacheNames().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => caches.delete(cacheName))
-      );
+    caches.keys().then((cacheNames) => {
+      return Promise.all(cacheNames.map((name) => caches.delete(name)));
     })
   );
 });
