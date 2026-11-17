@@ -2,37 +2,40 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Greendale Agropark - Attendance Kiosk</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#82c91e">
   <style>
-    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f8fafc; color: #1e293b; margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
-    .card { background: #ffffff; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.06); width: 460px; border: 1px solid #e2e8f0; border-top: 6px solid #82c91e; }
-    .logo-container { text-align: center; margin-bottom: 25px; }
-    .logo-container h1 { color: #0f172a; font-size: 24px; margin: 0; letter-spacing: 0.5px; font-weight: 700; }
+    * { box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f8fafc; color: #1e293b; margin: 0; padding: 15px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+    .card { background: #ffffff; padding: 25px 20px; border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.06); width: 100%; max-width: 440px; border: 1px solid #e2e8f0; border-top: 6px solid #82c91e; }
+    .logo-container { text-align: center; margin-bottom: 20px; }
+    .logo-container h1 { color: #0f172a; font-size: 22px; margin: 0; font-weight: 700; }
     .logo-container h1 span { color: #82c91e; }
-    .logo-container p { color: #64748b; font-size: 13px; margin: 4px 0 0 0; }
-    .form-group { margin-bottom: 20px; }
-    label { display: block; margin-bottom: 8px; font-weight: 600; color: #475569; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
-    .input-row { display: flex; gap: 10px; }
-    input { flex: 1; padding: 14px; box-sizing: border-box; background: #f8fafc; border: 1px solid #cbd5e1; color: #0f172a; border-radius: 8px; font-size: 20px; text-align: center; font-weight: 600; }
+    .logo-container p { color: #64748b; font-size: 12px; margin: 4px 0 0 0; }
+    .form-group { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 6px; font-weight: 600; color: #475569; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .input-row { display: flex; gap: 8px; }
+    input { flex: 1; padding: 12px; background: #f8fafc; border: 1px solid #cbd5e1; color: #0f172a; border-radius: 8px; font-size: 18px; text-align: center; font-weight: 600; width: 100%; }
     input:focus { border-color: #82c91e; outline: none; background: #fff; box-shadow: 0 0 0 3px rgba(130, 201, 30, 0.2); }
-    .btn-enter { padding: 0 24px; background: #0f172a; color: #fff; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; transition: background 0.2s; }
+    .btn-enter { padding: 0 20px; background: #0f172a; color: #fff; border: none; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; transition: background 0.2s; }
     .btn-enter:hover { background: #334155; }
     
-    /* Attention-grabbing large status box */
-    .info-box { background: #f0fdf4; border: 2px solid #82c91e; padding: 20px; border-radius: 10px; margin-bottom: 20px; display: none; text-align: center; }
-    .info-box p { margin: 8px 0; color: #166534; font-size: 16px; }
-    .info-box .emp-name { font-size: 20px; font-weight: bold; color: #0f172a; }
-    .info-box .status-badge { font-size: 18px; font-weight: 800; padding: 6px 12px; border-radius: 6px; display: inline-block; margin-top: 5px; }
+    /* Info & Summary Popups */
+    .info-box { background: #f0fdf4; border: 2px solid #82c91e; padding: 16px; border-radius: 10px; margin-bottom: 15px; display: none; text-align: center; }
+    .info-box .emp-name { font-size: 18px; font-weight: bold; color: #0f172a; }
+    .info-box .status-badge { font-size: 15px; font-weight: 800; padding: 4px 10px; border-radius: 6px; display: inline-block; margin-top: 6px; }
+    .summary-box { background: #eff6ff; border: 2px solid #3b82f6; padding: 16px; border-radius: 10px; margin-bottom: 15px; display: none; text-align: left; font-size: 14px; }
+    .summary-box h3 { margin: 0 0 8px 0; color: #1e40af; font-size: 16px; text-align: center; }
+    .summary-box p { margin: 6px 0; color: #1e293b; display: flex; justify-content: space-between; }
     
     .btn-container { display: flex; gap: 10px; }
-    button.action-btn { flex: 1; padding: 18px; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; color: #fff; transition: all 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    button.action-btn { flex: 1; padding: 16px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; color: #fff; transition: all 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
     button.action-btn:active { transform: scale(0.98); }
     .btn-in { background: #10b981; display: none; }
     .btn-out { background: #ef4444; display: none; }
-    #msg { margin-top: 15px; text-align: center; font-weight: bold; font-size: 16px; }
+    #msg { margin-top: 12px; text-align: center; font-weight: bold; font-size: 14px; }
   </style>
 </head>
 <body>
@@ -50,13 +53,26 @@
       </div>
     </div>
     
+    <!-- Active Status / Punch In-Out Box -->
     <div id="empInfo" class="info-box">
       <div class="emp-name" id="displayName">--</div>
-      <div style="color: #475569; font-size: 14px; margin-top: 2px;" id="displayDesig">--</div>
-      <div style="margin-top: 12px;">
+      <div style="color: #475569; font-size: 13px; margin-top: 2px;" id="displayDesig">--</div>
+      <div style="margin-top: 8px;" id="inTimeDisplay"></div>
+      <div style="margin-top: 8px;">
         <span class="status-badge" id="displayStatus">--</span>
       </div>
-      <div style="font-size: 13px; color: #64748b; margin-top: 8px;" id="displayTime">--</div>
+    </div>
+
+    <!-- Summary Details Popup After Punch Out -->
+    <div id="summaryBox" class="summary-box">
+      <h3>Shift Summary Report</h3>
+      <p><span>Name:</span> <strong id="sumName">--</strong></p>
+      <p><span>Designation:</span> <strong id="sumDesig">--</strong></p>
+      <p><span>Punch In:</span> <strong id="sumIn">--</strong></p>
+      <p><span>Punch Out:</span> <strong id="sumOut">--</strong></p>
+      <p><span>Total Hours:</span> <strong id="sumHours">--</strong></p>
+      <p><span>Overtime (OT):</span> <strong id="sumOT" style="color: #166534;">--</strong></p>
+      <p><span>Early Departure:</span> <strong id="sumEarly" style="color: #dc2626;">--</strong></p>
     </div>
     
     <div class="btn-container">
@@ -68,7 +84,7 @@
   </div>
 
 <script>
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzij8AoD9Jczq4g248fQNXA9oBnVLM1fogrbWOtN_SYLYQ_8_oBUPuwXtoR1q3hrWIG/exec";
+  const SCRIPT_URL = "YOUR_WEB_APP_URL_HERE";
 
   function handleKey(e) {
     if (e.key === 'Enter') {
@@ -79,11 +95,14 @@
   function checkEmployee() {
     var enroll = document.getElementById('enrollNo').value.trim();
     var box = document.getElementById('empInfo');
+    var sumBox = document.getElementById('summaryBox');
     var btnIn = document.getElementById('btnIn');
     var btnOut = document.getElementById('btnOut');
     var msg = document.getElementById('msg');
     
     msg.innerText = '';
+    sumBox.style.display = 'none';
+
     if (enroll.length < 1) {
       box.style.display = 'none';
       btnIn.style.display = 'none';
@@ -99,20 +118,21 @@
           document.getElementById('displayDesig').innerText = res.designation;
           box.style.display = 'block';
           
-          var timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-          document.getElementById('displayTime').innerText = "Current Time: " + timeNow;
-          
           var badge = document.getElementById('displayStatus');
+          var inTimeElem = document.getElementById('inTimeDisplay');
+
           if (res.isPunchedIn) {
-            badge.innerText = '⚠️ CURRENTLY IN (AWAITING OUT)';
+            badge.innerText = '⚠️ READY TO PUNCH OUT';
             badge.style.background = '#fee2e2';
             badge.style.color = '#dc2626';
+            inTimeElem.innerHTML = `<span style="font-size:13px; color:#1e293b;">Punch In Time: <strong>${res.punchInTime}</strong></span>`;
             btnIn.style.display = 'none';
             btnOut.style.display = 'block';
           } else {
             badge.innerText = '✅ READY TO PUNCH IN';
             badge.style.background = '#dcfce7';
             badge.style.color = '#166534';
+            inTimeElem.innerHTML = '';
             btnIn.style.display = 'block';
             btnOut.style.display = 'none';
           }
@@ -144,11 +164,24 @@
     .then(res => {
       msg.style.color = res.success ? '#10b981' : '#ef4444';
       msg.innerText = res.message;
+      
+      document.getElementById('empInfo').style.display = 'none';
+      document.getElementById('btnIn').style.display = 'none';
+      document.getElementById('btnOut').style.display = 'none';
+
+      if (res.success && action === 'OUT' && res.summary) {
+        document.getElementById('sumName').innerText = res.summary.name;
+        document.getElementById('sumDesig').innerText = res.summary.designation;
+        document.getElementById('sumIn').innerText = res.summary.punchIn;
+        document.getElementById('sumOut').innerText = res.summary.punchOut;
+        document.getElementById('sumHours').innerText = res.summary.totalHours + ' hrs';
+        document.getElementById('sumOT').innerText = res.summary.ot + ' hrs';
+        document.getElementById('sumEarly').innerText = res.summary.early + ' hrs';
+        document.getElementById('summaryBox').style.display = 'block';
+      }
+
       if (res.success) {
         document.getElementById('enrollNo').value = '';
-        document.getElementById('empInfo').style.display = 'none';
-        document.getElementById('btnIn').style.display = 'none';
-        document.getElementById('btnOut').style.display = 'none';
         document.getElementById('enrollNo').focus();
       }
     })
